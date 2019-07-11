@@ -1,0 +1,12 @@
+# Atari ROM files
+*.bin
+*.out
+
+# Executables
+*.exe
+
+# DASM Listing
+Walls.txt
+
+# Emulator files
+z26.gui
