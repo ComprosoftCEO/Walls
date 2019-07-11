@@ -1,10 +1,10 @@
-	processor 6502
+  processor 6502
 
-	include vcs.h
+  include vcs.h
   include macro.h
 
-	SEG
-	ORG $F000
+  SEG
+  ORG $F000
 
 Reset
 
