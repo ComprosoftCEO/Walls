@@ -89,13 +89,13 @@ VSYNC       ds 1    ; $00   0000 00x0   Vertical Sync Set-Clear
 VBLANK		ds 1	; $01   xx00 00x0   Vertical Blank Set-Clear
 WSYNC		ds 1	; $02   ---- ----   Wait for Horizontal Blank
 RSYNC		ds 1	; $03   ---- ----   Reset Horizontal Sync Counter
-NUSIZ0		ds 1	; $04   00xx 0xxx   Number-Size player/missle 0
-NUSIZ1		ds 1	; $05   00xx 0xxx   Number-Size player/missle 1
+NUSIZ0		ds 1	; $04   00mm 0ppp   Number-Size player/missle 0 (See Below)
+NUSIZ1		ds 1	; $05   00mm 0ppp   Number-Size player/missle 1 (See Below)
 COLUP0		ds 1	; $06   xxxx xxx0   Color-Luminance Player 0
 COLUP1      ds 1    ; $07   xxxx xxx0   Color-Luminance Player 1
 COLUPF      ds 1    ; $08   xxxx xxx0   Color-Luminance Playfield
 COLUBK      ds 1    ; $09   xxxx xxx0   Color-Luminance Background
-CTRLPF      ds 1    ; $0A   00xx 0xxx   Control Playfield, Ball, Collisions
+CTRLPF      ds 1    ; $0A   00bb 0fsr   Ball Size, Playfield Foreground, Score Mode, Reflect Playfield
 REFP0       ds 1    ; $0B   0000 x000   Reflection Player 0
 REFP1       ds 1    ; $0C   0000 x000   Reflection Player 1
 PF0         ds 1    ; $0D   xxxx 0000   Playfield Register Byte 0
@@ -130,7 +130,7 @@ RESMP1      ds 1    ; $29   0000 00x0   Reset Missle 1 to Player 1
 HMOVE       ds 1    ; $2A   ---- ----   Apply Horizontal Motion
 HMCLR       ds 1    ; $2B   ---- ----   Clear Horizontal Move Registers
 CXCLR       ds 1    ; $2C   ---- ----   Clear Collision Latches
- 
+
 ;-------------------------------------------------------------------------------
 
 			SEG.U TIA_REGISTERS_READ
@@ -196,5 +196,42 @@ T1024T      ds 1    ; $297      set 1024 clock interval
 ; segments.
 
             SEG
+
+;-------------------------------------------------------------------------------
+
+; Player Number & Size
+PLAYER_ONE           = %000     ; x........   One Copy
+PLAYER_TWO_CLOSE     = %001     ; x.x......   Two Copies - Close
+PLAYER_TWO_MEDIUM    = %010     ; x...x....   Two Copies - Medium
+PLAYER_THREE_CLOSE   = %011     ; x.x.x....   Three Copies - Close
+PLAYER_TWO_WIDE      = %100     ; x.......x   Two Copies - Wide
+PLAYER_DOUBLE        = %101     ; xx.......   Double Size Player
+PLAYER_THREE_MEDIUM  = %110     ; x...x...x   Three Copies - Medium
+PLAYER_QUAD          = %111     ; xxxx.....   Quad Sized Player
+
+; Other Player Settings
+PLAYER_REFLECT  = %00001000     ; Reflect Player
+PLAYER_VERT_DELAY      = %1     ; Vertical Delay Player for 1 Scanline
+
+; Playfield
+PF_REFLECT      = %00000001     ; Playfield Reflect Mode
+PF_SCORE_MODE   = %00000010     ; Playfield Score Mode
+PF_FOREGROUND   = %00000100     ; Playfield Foreground Mode
+
+; Missile Size & Settings
+MISSILE_1X      = %00000000     ; 1 Pixel Missile
+MISSILE_2X      = %00010000     ; 2 Pixels Missile
+MISSILE_4X      = %00100000     ; 4 Pixels Missile
+MISSILE_8X      = %00110000     ; 8 Pixels Misile
+MISSILE_ENABLE  = %00000010     ; Graphics Enable Missile
+MISSILE_RESET_PLAYER  = %10     ; Reset Missile to Player
+
+; Ball Size
+BALL_1X         = %00000000     ; 1 Pixel Ball
+BALL_2X         = %00010000     ; 2 Pixels Ball
+BALL_4X         = %00100000     ; 4 Pixels Ball
+BALL_8X         = %00110000     ; 8 Pixels Ball
+BALL_ENABLE     = %00000010     ; Graphics Enable Ball
+BALL_VERT_DELAY = %00000001     ; Vertical Delay Ball for 1 Scanline
 
 ; EOF
