@@ -98,9 +98,9 @@ COLUBK      ds 1    ; $09   xxxx xxx0   Color-Luminance Background
 CTRLPF      ds 1    ; $0A   00bb 0fsr   Ball Size, Playfield Foreground, Score Mode, Reflect Playfield
 REFP0       ds 1    ; $0B   0000 x000   Reflection Player 0
 REFP1       ds 1    ; $0C   0000 x000   Reflection Player 1
-PF0         ds 1    ; $0D   xxxx 0000   Playfield Register Byte 0
+PF0         ds 1    ; $0D   xxxx 0000   Playfield Register Byte 0 (Reversed Order)
 PF1         ds 1    ; $0E   xxxx xxxx   Playfield Register Byte 1
-PF2         ds 1    ; $0F   xxxx xxxx   Playfield Register Byte 2
+PF2         ds 1    ; $0F   xxxx xxxx   Playfield Register Byte 2 (Reversed Order)
 RESP0       ds 1    ; $10   ---- ----   Reset Player 0
 RESP1       ds 1    ; $11   ---- ----   Reset Player 1
 RESM0       ds 1    ; $12   ---- ----   Reset Missle 0
