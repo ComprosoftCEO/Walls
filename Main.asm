@@ -10,8 +10,11 @@
 
 Reset
 
+  CLEAN_START
+
 StartOfFrame
 
+  include "src/Kernel.asm"
 
   jmp StartOfFrame
 

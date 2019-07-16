@@ -6,38 +6,44 @@
   VERTICAL_SYNC
 
   ; Configure various global drawing settings
-  lda backgroundColor       ; Background/foreground color
-  sta COLUBK
-  lda wallColor
-  sta COLUPF
+  lda #0                          ; (2)
+  sta GRP0                        ; (3) Clear any misc. graphics registers
+  sta GRP1                        ; (3)
+  sta ENAM0                       ; (3)
+  sta ENAM1                       ; (3)
+  sta ENABL                       ; (3)
+  sta REFP0                       ; (3) No reflection for any objects
+  sta REFP1                       ; (3)
+  lda backgroundColor             ; (3) Configure foreground & background
+  sta COLUBK                      ; (3)
+  lda wallColor                   ; (3)
+  sta COLUPF                      ; (3)
+  lda #BALL_8X|PF_REFLECT         ; (2) 8 pixels ball, reflect player
+  sta CTRLPF                      ; (3)
+  lda #MISSILE_8X|PLAYER_DOUBLE   ; (2) 8 pixels missile, double size player
+  sta NUSIZ0                      ; (3)
+  sta NUSIZ1                      ; (3)
+                                  ; Total: 48 Cycles
 
   ; Set player horizontal position (Player uses the ball)
-  lda playerX
-  ldx #POSITION_BL
-  jsr PosObject      ; 1 Scanline
+  lda playerX                     ; (3)
+  ldx #POSITION_BL                ; (2)
+  jsr PosObject                   ; (1 Scanline)
 
   ; Set missile 0 horizontal position along left wall
   ;  to use for the left door color
-  lda #LEFT_DOOR_X
-  ldx #POSITION_M0
-  jsr PosObject       ; 1 Scanline
+  lda #LEFT_DOOR_X                ; (2)
+  ldx #POSITION_M0                ; (2)
+  jsr PosObject                   ; (1 Scanline)
 
   ; Set missile 1 horizontal position along right wall
   ;  to use for the right door color
-  lda #RIGHT_DOOR_X
-  ldx #POSITION_M1
-  jsr PosObject       ; 1 Scanline
+  lda #RIGHT_DOOR_X               ; (2)
+  ldx #POSITION_M1                ; (2)
+  jsr PosObject                   ; (1 Scanline)
 
-  ; Configure screen to reflect
-  lda #PF_REFLECT
-  sta CTRLPF
-
-  lda #0
-  sta COLUPF
-  sta COLUBK
-
-  ; 36 scanlines of vertical blank...
-  REPEAT 36
+  ; 31 leftover scanlines of vertical blank...
+  REPEAT 31
     sta WSYNC
   REPEND
 
