@@ -59,7 +59,7 @@
   bne .loop
 
   ; 1 scanline to prepare for drawing
-  ldy #0
+  ldy #192
   ldx wallsFlags
   lda #$FF
   sta PF0
@@ -70,95 +70,85 @@ Kernel  SUBROUTINE
 
   ; 16 scanlines for the top walls
 .topWalls
-  sec
   sta WSYNC
   PositionPlayerVertically  
-  iny
-  cpy #16
+  dey
+  cpy #192-16
   bne .topWalls
 
   ; 16 scanlines of horizontal walls
 .wall1
-  sec
   sta WSYNC
   PositionPlayerVertically
-  iny
-  cpy #32
+  dey
+  cpy #192-32
   bne .wall1
 
   ; 24 scanlines of door
 .door1
-  sec
   sta WSYNC
   PositionPlayerVertically
   lda #0
   sta PF0
-  iny
-  cpy #56
+  dey
+  cpy #192-56
   bne .door1
 
   ;24 scanlines of wall
 .wall2
-  sec
   sta WSYNC
   PositionPlayerVertically
   lda #$FF
   sta PF0
-  iny
-  cpy #80
+  dey
+  cpy #192-80
   bne .wall2
 
   ; 32 scanlines of door
 .door2
-  sec
   sta WSYNC
   PositionPlayerVertically
   lda #0
   sta PF0
-  iny
-  cpy #112
+  dey
+  cpy #192-112
   bne .door2
 
   ; 24 scanlines of wall
 .wall3
-  sec
   sta WSYNC
   PositionPlayerVertically
   lda #$FF
   sta PF0
-  iny
-  cpy #136
+  dey
+  cpy #192-136
   bne .wall3
 
   ; 24 scanlines of door
 .door3
-  sec
   sta WSYNC
   PositionPlayerVertically
   lda #0
   sta PF0
-  iny
-  cpy #160
+  dey
+  cpy #192-160
   bne .door3
 
   ; 16 scanlines of wall
 .wall4
-  sec
   sta WSYNC
   PositionPlayerVertically
   lda #$FF
   sta PF0
-  iny
-  cpy #176
+  dey
+  cpy #192-176
   bne .wall4
 
   ; 16 Scanlines for the bottom
 .bottom
-  sec
   sta WSYNC
   PositionPlayerVertically
-  iny
-  cpy #192
+  dey
   bne .bottom
   sta WSYNC
 
