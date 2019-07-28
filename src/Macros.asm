@@ -6,19 +6,20 @@
 ;
 ; Output: None
 ; Modified: Acc
-; Cycles: 18
+; Cycles: 16
+;
+; Note: Assumes that the carry is already set for proper subtraction
 ;
   MAC PositionPlayerVertically
     TYA               ; (2)
-    SEC               ; (2)
-    SBC playerY       ; (3)
+    SBC playerY       ; (3) Assumes that carry is already set
     CMP #8            ; (2) Player is 8 pixels high
     BCC .draw         ; (2)
     LDA #0            ; (2)
     BCS .end          ; (2)
 .draw
     LDA #BALL_ENABLE  ; (2)
-    SLEEP 2           ; (2)
+    SEC               ; (2)
 .end
     STA ENABL         ; (3)
   ENDM
