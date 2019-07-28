@@ -6,7 +6,8 @@
 *.exe
 
 # DASM Listing
-Walls.txt
+*.sym
+*.lst
 
 # Emulator files
 z26.gui

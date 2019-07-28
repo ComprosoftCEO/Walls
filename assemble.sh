@@ -5,7 +5,7 @@ outfile=$project
 
 echo "Assembling $project:"
 
-dasm $mainfile.asm -l$outfile.txt -f3 -v5 -o$outfile.bin
+dasm $mainfile.asm -s$outfile.sym -l$outfile.lst -f3 -v5 -o$outfile.bin
 if [ $? -ne 0 ]; then
 	echo "Error! Aborting..."
 	return;
