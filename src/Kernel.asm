@@ -1,4 +1,5 @@
 ; Main kernel for the game
+  PROCESSOR 6502
 
   ; Start of vertical blank processing
   lda #0
@@ -18,7 +19,7 @@
   sta COLUBK                      ; (3)
   lda wallColor                   ; (3)
   sta COLUPF                      ; (3)
-  lda #BALL_8X|PF_REFLECT         ; (2) 8 pixels ball, reflect player
+  lda #BALL_4X|PF_REFLECT         ; (2) 4 pixels ball, reflect player
   sta CTRLPF                      ; (3)
   lda #MISSILE_8X|PLAYER_DOUBLE   ; (2) 8 pixels missile, double size player
   sta NUSIZ0                      ; (3)
@@ -28,6 +29,14 @@
   ; Set player horizontal position (Player uses the ball)
   lda playerX                     ; (3)
   ldx #POSITION_BL                ; (2)
+  jsr PosObject                   ; (1 Scanline)
+
+  ; Set the item horizontal positions (Items use P0 and P1)
+  lda item1X                      ; (3)
+  ldx #POSITION_P0                ; (2)
+  jsr PosObject                   ; (1 Scanline)
+  lda item2X                      ; (3)
+  ldx #POSITION_P1                ; (2)
   jsr PosObject                   ; (1 Scanline)
 
   ; Set missile 0 horizontal position along left wall
@@ -42,35 +51,116 @@
   ldx #POSITION_M1                ; (2)
   jsr PosObject                   ; (1 Scanline)
 
-  ; 31 leftover scanlines of vertical blank...
-  REPEAT 31
-    sta WSYNC
-  REPEND
+  ; 28 leftover scanlines of vertical blank...
+  ldy #28
+.loop
+  dey
+  sty WSYNC
+  bne .loop
 
-  ; 192 scanlines of picture...
-  ldx #0
-  lda $2A
-  sta COLUPF
-  REPEAT 8
-    inx               ; 2
-    stx COLUBK        ; 3
-    lda #%11110000    ; 2
-    sta PF0           ; 3
-    lda #%00000000    ; 2
-    sta PF1           ; 3
-    lda #%00000000    ; 2
-    sta PF2           ; 3
-    SLEEP 30
-    lda #%11111111
-    sta PF1
-    sta WSYNC
-  REPEND
+  ; 1 scanline to prepare for drawing
+  ldy #0
+  ldx wallsFlags
+  lda #$FF
+  sta PF0
+  SEC
 
-  REPEAT 192 - 8
-    inx               ; 2
-    stx COLUBK        ; 3
-    sta WSYNC
-  REPEND
+  ; --- Start of screen ---
+Kernel  SUBROUTINE
+
+  ; 16 scanlines for the top walls
+.topWalls
+  sec
+  sta WSYNC
+  PositionPlayerVertically  
+  iny
+  cpy #16
+  bne .topWalls
+
+  ; 16 scanlines of horizontal walls
+.wall1
+  sec
+  sta WSYNC
+  PositionPlayerVertically
+  iny
+  cpy #32
+  bne .wall1
+
+  ; 24 scanlines of door
+.door1
+  sec
+  sta WSYNC
+  PositionPlayerVertically
+  lda #0
+  sta PF0
+  iny
+  cpy #56
+  bne .door1
+
+  ;24 scanlines of wall
+.wall2
+  sec
+  sta WSYNC
+  PositionPlayerVertically
+  lda #$FF
+  sta PF0
+  iny
+  cpy #80
+  bne .wall2
+
+  ; 32 scanlines of door
+.door2
+  sec
+  sta WSYNC
+  PositionPlayerVertically
+  lda #0
+  sta PF0
+  iny
+  cpy #112
+  bne .door2
+
+  ; 24 scanlines of wall
+.wall3
+  sec
+  sta WSYNC
+  PositionPlayerVertically
+  lda #$FF
+  sta PF0
+  iny
+  cpy #136
+  bne .wall3
+
+  ; 24 scanlines of door
+.door3
+  sec
+  sta WSYNC
+  PositionPlayerVertically
+  lda #0
+  sta PF0
+  iny
+  cpy #160
+  bne .door3
+
+  ; 16 scanlines of wall
+.wall4
+  sec
+  sta WSYNC
+  PositionPlayerVertically
+  lda #$FF
+  sta PF0
+  iny
+  cpy #176
+  bne .wall4
+
+  ; 16 Scanlines for the bottom
+.bottom
+  sec
+  sta WSYNC
+  PositionPlayerVertically
+  iny
+  cpy #192
+  bne .bottom
+  sta WSYNC
 
   lda #%01000010
   sta VBLANK        ; end of screen - enter blanking
