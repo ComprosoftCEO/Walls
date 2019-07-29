@@ -139,4 +139,5 @@
   stx {1}+2       ; Store PF2 on right
   sty {1}+3       ; Store PF1 on right
 .end
+  asl
   ENDM

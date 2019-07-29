@@ -34,10 +34,13 @@ Reset
   sta backgroundColor
   lda #$2C
   sta topDoorColors
+  sta bottomDoorColors
   lda #$3C
   sta topDoorColors+1
+  sta bottomDoorColors+1
   lda #$4C
   sta topDoorColors+2
+  sta bottomDoorColors+2
 
   lda #$FF
   ldx #0

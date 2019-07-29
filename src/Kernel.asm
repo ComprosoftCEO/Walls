@@ -85,26 +85,26 @@ Kernel  SUBROUTINE
 
   ; 8 scanlines for the top doors and walls
   ; The timing of these 8 lines are VERY IMPORTANT to have a stable image
-  ldx topWallBuffer+3         ; (3)
+  ldx topWallBuffer+3         ; (3) Fourth playfield graphic (Use X to get timing right)
 .topDoors
   sta WSYNC                   ; (3)
   PositionPlayerVertically    ; (16)
-  lda topWallBuffer           ; (3)
+  lda topWallBuffer           ; (3) First playfield graphic
   sta PF1                     ; (3)
-  lda topDoorColors           ; (3)
+  lda topDoorColors           ; (3) Door 1 color
   sta COLUBK                  ; (3)
-  lda.w topWallBuffer+1       ; (3)
+  lda.w topWallBuffer+1       ; (3) Second playfield graphic
   sta PF2                     ; (3)
-  lda topDoorColors+1         ; (3)
+  lda topDoorColors+1         ; (3) Door 2 color
   sta COLUBK                  ; (3)
-  lda topWallBuffer+2         ; (3)
+  lda topWallBuffer+2         ; (3) Third playfield graphic
   sta PF2                     ; (3)
-  lda topDoorColors+2         ; (4)
+  lda topDoorColors+2         ; (4) Door 3 color
   sta COLUBK                  ; (3)
   stx PF1                     ; (3)
   lda backgroundColor         ; (3)
   dey                         ; (3)
-  ldx topWallBuffer+3         ; (3)
+  ldx topWallBuffer+3         ; (3) Fourth playfield graphic (Use X to get timing right)
   sta COLUBK                  ; (3)
   cpy #192-8                  ; (2)
   bne .topDoors               ; (2)
@@ -197,16 +197,53 @@ Kernel  SUBROUTINE
   cpy #192-176
   bne .wall4
 
-  ; 16 Scanlines for the bottom
-.bottom
-  sta WSYNC
-  PositionPlayerVertically
-  dey
-  bne .bottom
-  sta WSYNC
+  ; 8 Scanlines for the bottom walls
+.bottomWalls
+  sta WSYNC                   ; (3)
+  PositionPlayerVertically    ; (16)
+  lda bottomWallBuffer        ; (3)
+  sta PF1                     ; (3) 22
+  lda bottomWallBuffer+1      ; (3)
+  sta PF2                     ; (3) 28
+  SLEEP 12                    ; (12)
+  lda bottomWallBuffer+2      ; (3)
+  sta PF2                     ; (3) 26
+  lda bottomWallBuffer+3      ; (3)
+  sta PF1                     ; (3)
+  dey                         ; (3)
+  cpy #192-184                ; (2)
+  bne .bottomWalls            ; (2)
 
+  ; 8 scanlines for the bottom doors and walls
+  ; The timing of these 8 lines are VERY IMPORTANT to have a stable image
+  ldx bottomWallBuffer+3      ; (3) Fourth playfield graphic (Use X to get timing right)
+.bottomDoors
+  sta WSYNC                   ; (3)
+  PositionPlayerVertically    ; (16)
+  lda bottomWallBuffer        ; (3) First playfield graphic
+  sta PF1                     ; (3)
+  lda bottomDoorColors        ; (3) Door 1 color
+  sta COLUBK                  ; (3)
+  lda.w bottomWallBuffer+1    ; (3) Second playfield graphic
+  sta PF2                     ; (3)
+  lda bottomDoorColors+1      ; (3) Door 2 color
+  sta COLUBK                  ; (3)
+  lda bottomWallBuffer+2      ; (3) Third playfield graphic
+  sta PF2                     ; (3)
+  lda bottomDoorColors+2      ; (4) Door 3 color
+  sta COLUBK                  ; (3)
+  stx PF1                     ; (3)
+  lda backgroundColor         ; (3)
+  dey                         ; (3)
+  ldx bottomWallBuffer+3      ; (3) Fourth playfield graphic (Use X to get timing right)
+  sta COLUBK                  ; (3)
+  cpy #0                      ; (2)
+  bne .bottomDoors            ; (2)
+
+  ; End of screen - enter blanking
+  sta WSYNC
   lda #%01000010
-  sta VBLANK        ; end of screen - enter blanking
+  sta VBLANK        
 
   ; 30 scanlines of overscan...
   REPEAT 30
