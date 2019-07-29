@@ -32,6 +32,12 @@ Reset
   sta wallColor
   lda #$FC
   sta backgroundColor
+  lda #$2C
+  sta topDoorColors
+  lda #$3C
+  sta topDoorColors+1
+  lda #$4C
+  sta topDoorColors+2
 
   lda #$FF
   ldx #0
@@ -46,6 +52,7 @@ StartOfFrame
 
   include "src/Kernel.asm"
   inc playerY
+  inc horDoors
 
   jmp StartOfFrame
 
