@@ -21,10 +21,10 @@ Kernel  SUBROUTINE
 
   ; Set the item horizontal positions (Items use P0 and P1)
   ;  4 total scanlines
-  lda item1X          ; (3)
+  lda leftItemX       ; (3)
   ldx #POSITION_P0    ; (2)
   jsr PosObject       ; (1 Scanline)
-  lda item2X          ; (3)
+  lda rightItemX      ; (3)
   ldx #POSITION_P1    ; (2)
   jsr PosObject       ; (1 Scanline)
 
@@ -73,7 +73,6 @@ Kernel  SUBROUTINE
 
   ; 1 scanline to prepare for drawing
   ldy #192
-  ldx wallsFlags
   lda #$FF
   sta PF0
   lda #$0
@@ -191,6 +190,9 @@ Kernel  SUBROUTINE
 .wall4
   sta WSYNC
   PositionPlayerVertically
+
+  ; Just for now to avoid page overflow with branch
+  SLEEP 40
   lda #$FF
   sta PF0
   dey

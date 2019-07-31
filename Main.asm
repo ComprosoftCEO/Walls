@@ -19,15 +19,6 @@ Reset
   lda #0
   sta playerY
 
-  lda #54
-  sta item1X
-  lda #37
-  sta item1Y
-  lda #140
-  sta item2X
-  lda #88
-  sta item2Y
-
   lda #$1E
   sta wallColor
   lda #$FC
@@ -41,15 +32,6 @@ Reset
   lda #$4C
   sta topDoorColors+2
   sta bottomDoorColors+2
-
-  lda #$FF
-  ldx #0
-.temp_loop
-  sta item1Buffer,X
-  sta item2Buffer,x
-  inx
-  cpx #8
-  bne .temp_loop
 
 StartOfFrame
 
