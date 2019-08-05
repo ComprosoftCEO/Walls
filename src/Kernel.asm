@@ -139,54 +139,74 @@ Kernel  SUBROUTINE
 .wall1
   sta WSYNC                   ; 3 [74]
   PositionPlayerVertically    ; 16[16]
-  lda #$FF                    ; 3 [19] Always set left and right wall
-  sta PF0                     ; 3 [22]
-  lda #$00                    ; 3 [25] Always clear middle area between walls
-  sta PF1                     ; 3 [28]
-  lda wall1Buffer             ; 3 [31] Left of middle walls
-  sta PF2                     ; 3 [34]
-  lda wall1Buffer+1           ; 3 [37] Right of middle walls
-  dey                         ; 2 [39]
-  sty tempYBuffer             ; 3 [42] Loading sprite requires Y to be stored in temp location
-  cpy #192-24                 ; 2 [44]
-  sta PF2                     ; 3 [47]
-  bne .wall1                  ; 2 [49]
+  lda #$00                    ; 3 [19] Always clear middle area between walls
+  sta PF1                     ; 3 [22]
+  lda wall1Buffer             ; 3 [25] Left of middle walls
+  sta PF2                     ; 3 [28]
+  lda wall1Buffer+1           ; 3 [31] Right of middle walls
+  dey                         ; 2 [33]
+  sty tempYBuffer             ; 3 [36] Loading sprite requires Y to be stored in temp location
+  cpy #192-24                 ; 2 [38]
+  sta PF2                     ; 3 [41]
+  bne .wall1                  ; 2 [43]
 
   ; Prepare the first item for the next round
-  tya                         ; 2 [51] Compute graphics index
-  lsr                         ; 2 [53] Shift right to have 4 scanline pixels
-  lsr                         ; 2 [55]
-  and #$0f                    ; 2 [57] Mask extra bits
-  tay                         ; 2 [59]
-  lda (leftItem1Sprite),y     ; 6 [65] Load and store the sprite
-  sta GRP0                    ; 3 [68]
-  ldy tempYBuffer             ; 3 [71] Get back Y from temporary location
-  sec                         ; 2 [73] Carry must be set to position player
+  tya                         ; 2 [45] Compute graphics index
+  adc #$38                    ; 2 [47] Add an offset to zero the index
+  lsr                         ; 2 [49] Shift right to have 4 scanline pixels
+  lsr                         ; 2 [51]
+  and #$07                    ; 2 [53] Mask extra bits
+  tay                         ; 2 [55]
+  lda (leftItem1Sprite),y     ; 6 [61] Load and store the sprite
+  sta GRP0                    ; 3 [64]
+  ldy tempYBuffer             ; 3 [67] Get back Y from temporary location
+  sec                         ; 2 [69] Carry must be set to position player
 
   ; 8 scanlines of a horizontal wall with an item
+  ;  Updates the item on every other scanline
 .wall1Item
-  sta WSYNC                   ; 3 [76]
+  sta WSYNC                   ; 3 [72]
+  ; Update right item
   PositionPlayerVertically    ; 16[16]
   lda wall1Buffer             ; 3 [19] Left of middle walls
   sta PF2                     ; 3 [22]
   sty tempYBuffer             ; 3 [25] Loading sprite requires Y to be stored in temp location
   tya                         ; 2 [27] Compute graphics index
-  lsr                         ; 2 [29] Shift right to have 4 scanline pixels
-  lsr                         ; 2 [31]
-  and #$0f                    ; 2 [33] Mask extra bits
-  tay                         ; 2 [35]
-  lda (leftItem1Sprite),y     ; 6 [41] Load and store the sprite
-  sta GRP0                    ; 3 [44]
-  lda wall1Buffer+1           ; 3 [47] Right of middle walls
-  sta PF2                     ; 3 [50]
-  ldy tempYBuffer             ; 3 [53] Get back Y from temporary location
-  dey                         ; 2 [55]
-  cpy #192-32                 ; 2 [57]
-  bne .wall1Item              ; 2 [59]
+  adc #$38                    ; 2 [29] Add an offset to zero the index
+  lsr                         ; 2 [31] Shift right to have 4 scanline pixels
+  lsr                         ; 2 [33]
+  and #$0f                    ; 2 [35] Mask extra bits
+  tay                         ; 2 [37]
+  lda (leftItem1Sprite),y     ; 6 [43] Load and store the sprite
+  ldy wall1Buffer+1           ; 3 [46] Right of middle walls
+  sty PF2                     ; 3 [49]
+  sta GRP0                    ; 3 [52]
+  ldy tempYBuffer             ; 3 [55] Get back Y from temporary location
+  dey                         ; 2 [57]
+  sta WSYNC                   ; 3 [60]
+  ; Update left item
+  PositionPlayerVertically    ; 16[16]
+  lda wall1Buffer             ; 3 [19] Left of middle walls
+  sta PF2                     ; 3 [22]
+  sty tempYBuffer             ; 3 [25] Loading sprite requires Y to be stored in temp location
+  tya                         ; 2 [27] Compute graphics index
+  adc #$3C                    ; 2 [29] Add an offset to zero the index
+  lsr                         ; 2 [31] Shift right to have 4 scanline pixels
+  lsr                         ; 2 [33]
+  and #$0f                    ; 2 [35] Mask extra bits
+  tay                         ; 2 [37]
+  lda (leftItem1Sprite),y     ; 6 [43] Load and store the sprite
+  ldy wall1Buffer+1           ; 3 [46] Right of middle walls
+  sty PF2                     ; 3 [49]
+  sta GRP0                    ; 3 [52]
+  ldy tempYBuffer             ; 3 [55] Get back Y from temporary location
+  dey                         ; 2 [57]
+  cpy #192-32                 ; 2 [59]
+  bne .wall1Item              ; 2 [61]
 
   ; 24 scanlines of door
 .door1
-  sta WSYNC                   ; 3 [62]
+  sta WSYNC                   ; 3 [64]
   PositionPlayerVertically
   lda #0
   sta PF0
