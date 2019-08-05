@@ -21,6 +21,8 @@ Reset
 
   lda #$1E
   sta wallColor
+  lda #$5F
+  sta topLiquid
   lda #$FC
   sta backgroundColor
   lda #$2C
@@ -36,6 +38,10 @@ Reset
   sta wall1Buffer
   lda #%11000000
   sta wall1Buffer+1
+  lda #<grStairDown
+  sta leftItem1Sprite
+  lda #>grStairUp
+  sta leftItem1Sprite+1
 
 StartOfFrame
 

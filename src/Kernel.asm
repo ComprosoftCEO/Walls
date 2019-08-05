@@ -90,47 +90,50 @@ Kernel  SUBROUTINE
   ; The timing of these 8 lines are VERY IMPORTANT to have a stable image
   ldx topWallBuffer+3         ; (3) Fourth playfield graphic (Use X to get timing right)
 .topDoors
-  sta WSYNC                   ; (3)
-  PositionPlayerVertically    ; (16)
-  lda topWallBuffer           ; (3) First playfield graphic
-  sta PF1                     ; (3)
-  lda topDoorColors           ; (3) Door 1 color
-  sta COLUBK                  ; (3)
-  lda.w topWallBuffer+1       ; (3) Second playfield graphic
-  sta PF2                     ; (3)
-  lda topDoorColors+1         ; (3) Door 2 color
-  sta COLUBK                  ; (3)
-  lda topWallBuffer+2         ; (3) Third playfield graphic
-  sta PF2                     ; (3)
-  lda topDoorColors+2         ; (4) Door 3 color
-  sta COLUBK                  ; (3)
-  stx PF1                     ; (3)
-  lda backgroundColor         ; (3)
-  dey                         ; (3)
-  ldx topWallBuffer+3         ; (3) Fourth playfield graphic (Use X to get timing right)
-  sta COLUBK                  ; (3)
-  cpy #192-8                  ; (2)
-  bne .topDoors               ; (2)
+  sta WSYNC                   ; 3
+  PositionPlayerVertically    ; 16[16]
+  lda topWallBuffer           ; 3 [19] First playfield graphic
+  sta PF1                     ; 3 [22]
+  lda topDoorColors           ; 3 [25] Door 1 color
+  sta COLUBK                  ; 3 [28]
+  lda.w topWallBuffer+1       ; 3 [31] Second playfield graphic
+  sta PF2                     ; 3 [34]
+  lda topDoorColors+1         ; 3 [37] Door 2 color
+  sta COLUBK                  ; 3 [40]
+  lda topWallBuffer+2         ; 3 [43] Third playfield graphic
+  sta PF2                     ; 3 [46]
+  lda topDoorColors+2         ; 4 [50] Door 3 color
+  sta COLUBK                  ; 3 [53]
+  stx PF1                     ; 3 [56]
+  dey                         ; 3 [59]
+  ldx topWallBuffer+3         ; 3 [62] Fourth playfield graphic (Use X to get timing right)
+  cpy #192-8                  ; 2 [64]
+  bne .topDoors               ; 2 [66]
+  lda backgroundColor         ; 3 [69] Background color for next scanline
+  sta COLUBK                  ; 3 [72]
 
   ; 8 scanlines for the top walls (where doors aren't shown)
 .topWalls
-  sta WSYNC                   ; (3)
-  PositionPlayerVertically    ; (16)
-  lda topWallBuffer           ; (3)
-  sta PF1                     ; (3) 22
-  lda topWallBuffer+1         ; (3)
-  sta PF2                     ; (3) 28
-  SLEEP 12                    ; (12)40
-  lda topWallBuffer+2         ; (3)
-  sta PF2                     ; (3) 46
-  lda topWallBuffer+3         ; (3)
-  sta PF1                     ; (3) 52
-  dey                         ; (3)
-  cpy #192-16                 ; (2)
-  bne .topWalls               ; (2) 59
-  SLEEP 6                     ; (10)
-  lda topLiquid               ; (3) 68
-  sta COLUBK                  ; (3) 71
+  sta WSYNC                   ; 3 [75]
+  PositionPlayerVertically    ; 16[16]
+  lda topWallBuffer           ; 3 [19] First playfield graphic
+  sta PF1                     ; 3 [22]
+  lda topWallBuffer+1         ; 3 [25] Second playfield graphic
+  sta PF2                     ; 3 [28]
+  lda leftItem1Color          ; 3 [31] Delay by setting up the item colors
+  sta COLUP0                  ; 3 [34] Left item color
+  lda rightItem1Color         ; 3 [37] Right item color
+  sta COLUP1                  ; 3 [40]
+  lda topWallBuffer+2         ; 3 [43] Third playfield graphics
+  sta PF2                     ; 3 [46]
+  lda topWallBuffer+3         ; 3 [49] Fourth playfield graphic
+  sta PF1                     ; 3 [52]
+  dey                         ; 3 [55]
+  cpy #192-16                 ; 2 [57]
+  bne .topWalls               ; 2 [59]
+  SLEEP 6                     ; 6 [65] Delay to get liquid timing right
+  lda topLiquid               ; 3 [68] Get the liquid for the top half
+  sta COLUBK                  ; 3 [71]
 
   ; 8 scanlines of horizontal walls with no item
 .wall1
@@ -160,6 +163,7 @@ Kernel  SUBROUTINE
   ldy tempYBuffer             ; 3 [71] Get back Y from temporary location
   sec                         ; 2 [73] Carry must be set to position player
 
+  ; 8 scanlines of a horizontal wall with an item
 .wall1Item
   sta WSYNC                   ; 3 [76]
   PositionPlayerVertically    ; 16[16]
