@@ -32,6 +32,10 @@ Reset
   lda #$4C
   sta topDoorColors+2
   sta bottomDoorColors+2
+  lda #%11000001
+  sta wall1Buffer
+  lda #%11000000
+  sta wall1Buffer+1
 
 StartOfFrame
 

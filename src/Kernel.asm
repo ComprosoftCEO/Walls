@@ -40,7 +40,7 @@ Kernel  SUBROUTINE
 
   ; 29 leftover scanlines of vertical blank...
   ; Do other misc calculations to load the data
-  lda #(28 * 72) / 64
+  lda #(28 * 76 - 3) / 64
   sta TIM64T
 
   ; Configure various global drawing settings
@@ -52,6 +52,10 @@ Kernel  SUBROUTINE
   sta ENABL                       ; (3)
   sta REFP0                       ; (3) No reflection for any objects
   sta REFP1                       ; (3)
+  sta VDELP1                      ; (3) No delay for player 1 and ball
+  sta VDELBL                      ; (3)
+  lda #PLAYER_VERT_DELAY          ; (3) Vertical delay player 0
+  sta VDELP0                      ; (3)
   lda backgroundColor             ; (3) Configure foreground & background
   sta COLUBK                      ; (3)
   lda wallColor                   ; (3)
@@ -116,29 +120,69 @@ Kernel  SUBROUTINE
   sta PF1                     ; (3) 22
   lda topWallBuffer+1         ; (3)
   sta PF2                     ; (3) 28
-  SLEEP 12                    ; (12)
+  SLEEP 12                    ; (12)40
   lda topWallBuffer+2         ; (3)
-  sta PF2                     ; (3) 26
+  sta PF2                     ; (3) 46
   lda topWallBuffer+3         ; (3)
-  sta PF1                     ; (3)
+  sta PF1                     ; (3) 52
   dey                         ; (3)
   cpy #192-16                 ; (2)
-  bne .topWalls               ; (2)
+  bne .topWalls               ; (2) 59
+  SLEEP 6                     ; (10)
+  lda topLiquid               ; (3) 68
+  sta COLUBK                  ; (3) 71
 
-  ; 16 scanlines of horizontal walls
+  ; 8 scanlines of horizontal walls with no item
 .wall1
-  sta WSYNC
-  PositionPlayerVertically
-  lda #$00
-  sta PF1
-  STA PF2
-  dey
-  cpy #192-32
-  bne .wall1
+  sta WSYNC                   ; 3 [74]
+  PositionPlayerVertically    ; 16[16]
+  lda #$FF                    ; 3 [19] Always set left and right wall
+  sta PF0                     ; 3 [22]
+  lda #$00                    ; 3 [25] Always clear middle area between walls
+  sta PF1                     ; 3 [28]
+  lda wall1Buffer             ; 3 [31] Left of middle walls
+  sta PF2                     ; 3 [34]
+  lda wall1Buffer+1           ; 3 [37] Right of middle walls
+  dey                         ; 2 [39]
+  sty tempYBuffer             ; 3 [42] Loading sprite requires Y to be stored in temp location
+  cpy #192-24                 ; 2 [44]
+  sta PF2                     ; 3 [47]
+  bne .wall1                  ; 2 [49]
+
+  ; Prepare the first item for the next round
+  tya                         ; 2 [51] Compute graphics index
+  lsr                         ; 2 [53] Shift right to have 4 scanline pixels
+  lsr                         ; 2 [55]
+  and #$0f                    ; 2 [57] Mask extra bits
+  tay                         ; 2 [59]
+  lda (leftItem1Sprite),y     ; 6 [65] Load and store the sprite
+  sta GRP0                    ; 3 [68]
+  ldy tempYBuffer             ; 3 [71] Get back Y from temporary location
+  sec                         ; 2 [73] Carry must be set to position player
+
+.wall1Item
+  sta WSYNC                   ; 3 [76]
+  PositionPlayerVertically    ; 16[16]
+  lda wall1Buffer             ; 3 [19] Left of middle walls
+  sta PF2                     ; 3 [22]
+  sty tempYBuffer             ; 3 [25] Loading sprite requires Y to be stored in temp location
+  tya                         ; 2 [27] Compute graphics index
+  lsr                         ; 2 [29] Shift right to have 4 scanline pixels
+  lsr                         ; 2 [31]
+  and #$0f                    ; 2 [33] Mask extra bits
+  tay                         ; 2 [35]
+  lda (leftItem1Sprite),y     ; 6 [41] Load and store the sprite
+  sta GRP0                    ; 3 [44]
+  lda wall1Buffer+1           ; 3 [47] Right of middle walls
+  sta PF2                     ; 3 [50]
+  ldy tempYBuffer             ; 3 [53] Get back Y from temporary location
+  dey                         ; 2 [55]
+  cpy #192-32                 ; 2 [57]
+  bne .wall1Item              ; 2 [59]
 
   ; 24 scanlines of door
 .door1
-  sta WSYNC
+  sta WSYNC                   ; 3 [62]
   PositionPlayerVertically
   lda #0
   sta PF0

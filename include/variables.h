@@ -43,4 +43,8 @@ rightItem3Color     ds 1    ; Color of the bottom right item
 
 ; Wall Buffers (calculated by the Kernel)
 topWallBuffer       ds 4    ; Temporary buffer for the top wall PF graphics
+wall1Buffer         ds 2    ; First layer of walls buffer
 bottomWallBuffer    ds 4    ; Temporary buffer for the bottom wall PF graphics
+
+; Other temporary variables
+tempYBuffer = topWallBuffer ; Only use this after finished with topWallBuffer
