@@ -134,77 +134,84 @@ Kernel  SUBROUTINE
   dey                         ; 3  [55]
   cpy #192-16                 ; 2  [59]
   bne .topWalls               ; 2/3[61]
-  SLEEP 6                     ; 6 [65] Delay to get liquid timing right
-  lda topLiquid               ; 3 [68] Get the liquid for the top half
-  sta COLUBK                  ; 3 [71]
+  SLEEP 6                     ; 6  [65] Delay to get liquid timing right
+  lda topLiquid               ; 3  [68] Get the liquid for the top half
+  sta COLUBK                  ; 3  [71]
 
   ; 8 scanlines of horizontal walls with no item
 .wall1
-  sta WSYNC                   ; 3 [74]
-  tya                         ; 2 [ 2]
-  PositionPlayerVertically    ; 14[16]
-  lda #$00                    ; 2 [18] Always clear middle area between walls
-  sta PF1                     ; 3 [21]
-  lda wall1Buffer             ; 3 [24] Left of middle walls
-  sta PF2                     ; 3 [27]
-  lda wall1Buffer+1           ; 3 [30] Right of middle walls
-  ldx #1                      ; 2 [32] Load X to waste a cycle. X is used for default item offset of 1
-  SLEEP 2                     ; 2 [34]
-  dey                         ; 2 [36]
-  cpy #192-24                 ; 2 [38]
-  sta PF2                     ; 3 [41]
-  bne .wall1                  ; 2 [43]
+  sta WSYNC                   ; 3  [74]
+  tya                         ; 2  [ 2]
+  PositionPlayerVertically    ; 14 [16]
+  lda #$00                    ; 2  [18] Always clear middle area between walls
+  sta PF1                     ; 3  [21]
+  lda wall1Buffer             ; 3  [24] Left of middle walls
+  sta PF2                     ; 3  [27]
+  lda wall1Buffer+1           ; 3  [30] Right of middle walls
+  ldx #1                      ; 2  [32] Load X to waste a cycle. X is used for default item offset of 1
+  SLEEP 2                     ; 2  [34] Extra bit of delay
+  dey                         ; 2  [36]
+  cpy #192-24                 ; 2  [38]
+  sta PF2                     ; 3  [41]
+  bne .wall1                  ; 2/3[43]
 
   ; Prepare the first item for the next round
-  stx itemSpriteOffset        ; 3 [46] Set the item offset to 1
-  ldy #0                      ; 2 [48] Compute graphics index
-  lda (leftItem1Sprite),y     ; 6 [54] Load and store the left sprite
-  sta GRP0                    ; 3 [57]
-  lda (rightItem1Sprite),y    ; 6 [63] Load and store the right sprite
-  sta GRP1                    ; 3 [66]
-  ldy #192-24                 ; 2 [68] We know what the Y will be
-  sec                         ; 2 [70] Carry must be set to position player
+  stx itemSpriteOffset        ; 3  [46] Set the item offset to 1
+  ldy #0                      ; 2  [48] Compute graphics index
+  lda (leftItem1Sprite),y     ; 6  [54] Load and store the left sprite
+  sta GRP0                    ; 3  [57]
+  lda (rightItem1Sprite),y    ; 6  [63] Load and store the right sprite
+  sta GRP1                    ; 3  [66]
+  ldy #192-24                 ; 2  [68] We know what the Y will be
+  sec                         ; 2  [70] Carry must be set to position player
 
   ; 8 scanlines of a horizontal wall with an item
-  ;  Updates the item index every 4 scanlines
+  ;  Updates the item index after 4 scanlines
+  ;  Sorry this logic is a bit convoluted (But it works!)
 .wall1Item
-  sta WSYNC                   ; 3 [73]
-  tya                         ; 2 [ 2]
-  PositionPlayerVertically    ; 14[16]
-  lda wall1Buffer             ; 3 [19] Left of middle walls
-  sta PF2                     ; 3 [22]
-  sty tempYBuffer             ; 3 [25] Load sprites every scanline to waste some cycles
-  ldy itemSpriteOffset        ; 3 [28]
-  lda (leftItem1Sprite),y     ; 6 [34] Load and store the left sprite
-  sta GRP0                    ; 3 [37]
-  lda (rightItem1Sprite),y    ; 6 [43] Load and store the right sprite
-  ldy wall1Buffer+1           ; 3 [46] Right of middle walls
-  sty PF2                     ; 3 [49]
-  sta GRP1                    ; 3 [52]
-  ldy tempYBuffer             ; 3 [55]
-  dey                         ; 2 [57]
-  cpy #192-28                 ; 2 [59]
-  bne .wall1Item_NoInc        ; 2 [61]
-  inc itemSpriteOffset        ; 5 [66]
-.wall1Item_NoInc
-  cpy #192-32                 ; 2 [63|68]
-  bne .wall1Item              ; 2 [65|70]
-  inc itemSpriteOffset        ; 5 [70] Add 1 to the offset
+  sta WSYNC                   ; 3  [73]
+  tya                         ; 2  [ 2]
+  PositionPlayerVertically    ; 16 [18]
+  lda wall1Buffer             ; 3  [21] Left of middle walls
+  sta PF2                     ; 3  [24]
+  dey                         ; 2  [26] Go ahead and update Y to delay a bit
+  cpy #192-28                 ; 2  [28] When to update item graphics (4 scanlines in)
+  bne .wall1Item_NoUpdate     ; 2/3[30]
+; Update the item graphics
+  ldy #1                      ; 2  [32]
+  lda (leftItem1Sprite),y     ; 6  [38] Load and store the left sprite
+  sta GRP0                    ; 3  [41]
+  lda wall1Buffer+1           ; 3  [44] Right of middle walls
+  sta PF2                     ; 3  [47]
+  lda (rightItem1Sprite),y    ; 6  [53] Load and store the right sprite
+  sta GRP1                    ; 3  [56]
+  ldy #192-28                 ; 2  [58]
+  jmp .wall1Item_Cont         ; 3  [61]
+; Don't update the item graphics
+.wall1Item_NoUpdate
+  SLEEP 9                     ; 6  [40]
+  lda wall1Buffer+1           ; 3  [43] Right of middle walls
+  sta PF2                     ; 3  [46]
+
+  ; Prepare for drawing the next chunk
+  lda door1Buffer             ; 3  [49] Load registers to quickly update frame data
+  ldx leftDoorColors          ; 3  [52]
+.wall1Item_Cont
+  cpy #192-32                 ; 2  [64|54]
+  bne .wall1Item              ; 2  [66|56]
 
   ; 32 scanlines for the first door
   ;  Door is rendered in 3 chunks, 8-16-8
   ;  Updates the item on every other scanline
 
   ; 8 scanlines for first chunk of door
-  lda door1Buffer             ; 3 [63] Load registers to quickly update frame data
-  ldx leftDoorColors          ; 3 [66]
 .door1Chunk1
-  sta WSYNC                   ; 3 [72]
-  sta PF0                     ; 3 [ 3] Left door visible or not
-  stx COLUP0                  ; 3 [ 6] Left door color
+  tya                         ; 2  [68]
+  sta WSYNC                   ; 3  [71]
+  sta PF0                     ; 3  [ 3] Left door visible or not
+  stx COLUP0                  ; 3  [ 6] Left door color
   ; Update right item
-  tya                         ; 2 [ 2]
-  PositionPlayerVertically    ; 14[16]
+  PositionPlayerVertically    ; 16 [16]
   dey
   cpy #192-56
   bne .door1Chunk1
