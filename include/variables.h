@@ -4,6 +4,7 @@
 ; Player position
 playerX             ds 1    ; Horizontal position of the player
 playerY             ds 1    ; Reverse scanline of the player (192 = top, 0 = bottom)
+playerHeight        ds 1    ; Height (in pixels) of the player (for falling into liquid animation)
 
 ; Dungeon colors
 backgroundColor     ds 1    ; Color of the background

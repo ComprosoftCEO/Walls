@@ -82,58 +82,58 @@ Kernel  SUBROUTINE
   sta PF0
   lda #$0
   SEC
-  sta WSYNC                   ; 3
-  sta VBLANK                  ; 3 [ 3] Accumulator D1=0, turns off Vertical Blank signal (image output on)
+  sta WSYNC
+  sta VBLANK                  ; 3  [ 3] Accumulator D1=0, turns off Vertical Blank signal (image output on)
 
   ; --- Start of screen ---
 
   ; 8 scanlines for the top doors and walls
   ;  The timing of these 8 lines are VERY IMPORTANT to have a stable image
-  ldx topWallBuffer+3         ; 3 [ 6] Fourth playfield graphic (Use X to get timing right)
+  ldx topWallBuffer+3         ; 3  [ 6] Fourth playfield graphic (Use X to get timing right)
 .topDoors
-  sta WSYNC                   ; 3 [ 9]
-  tya                         ; 2 [ 2]
-  PositionPlayerVertically    ; 14[16]
-  lda topWallBuffer           ; 3 [19] First playfield graphic
-  sta PF1                     ; 3 [22]
-  lda topDoorColors           ; 3 [25] Door 1 color
-  sta COLUBK                  ; 3 [28]
-  lda.w topWallBuffer+1       ; 3 [31] Second playfield graphic
-  sta PF2                     ; 3 [34]
-  lda topDoorColors+1         ; 3 [37] Door 2 color
-  sta COLUBK                  ; 3 [40]
-  lda topWallBuffer+2         ; 3 [43] Third playfield graphic
-  sta PF2                     ; 3 [46]
-  lda topDoorColors+2         ; 4 [50] Door 3 color
-  sta COLUBK                  ; 3 [53]
-  stx PF1                     ; 3 [56]
-  dey                         ; 3 [59]
-  ldx topWallBuffer+3         ; 3 [62] Fourth playfield graphic (Use X to get timing right)
-  cpy #192-8                  ; 2 [64]
-  bne .topDoors               ; 2 [66]
-  lda backgroundColor         ; 3 [69] Background color for next scanline
-  sta COLUBK                  ; 3 [72]
+  tya                         ; 2  [ 8]
+  sta WSYNC                   ; 3  [11]
+  PositionPlayerVertically    ; 16 [16]
+  lda topWallBuffer           ; 3  [19] First playfield graphic
+  sta PF1                     ; 3  [22]
+  dey                         ; 2  [24] Decrement Y to get timing right
+  lda topDoorColors           ; 3  [27] Door 1 color
+  sta COLUBK                  ; 3  [30]
+  lda topWallBuffer+1         ; 3  [33] Second playfield graphic
+  sta PF2                     ; 3  [36]
+  lda topDoorColors+1         ; 3  [39] Door 2 color
+  sta COLUBK                  ; 3  [42]
+  lda topWallBuffer+2         ; 3  [45] Third playfield graphic
+  sta PF2                     ; 3  [48]
+  lda topDoorColors+2         ; 3  [51] Door 3 color
+  sta COLUBK                  ; 3  [54]
+  stx PF1                     ; 3  [57]
+  ldx topWallBuffer+3         ; 3  [60] Fourth playfield graphic (Use X to get timing right)
+  cpy #192-8                  ; 2  [62]
+  bne .topDoors               ; 2/3[64]
+  lda backgroundColor         ; 3  [67] Background color for next scanline
+  sta COLUBK                  ; 3  [70]
 
   ; 8 scanlines for the top walls (where doors aren't shown)
 .topWalls
-  sta WSYNC                   ; 3 [75]
-  tya                         ; 2 [ 2]
-  PositionPlayerVertically    ; 14[16]
-  lda topWallBuffer           ; 3 [19] First playfield graphic
-  sta PF1                     ; 3 [22]
-  lda topWallBuffer+1         ; 3 [25] Second playfield graphic
-  sta PF2                     ; 3 [28]
-  lda leftItem1Color          ; 3 [31] Delay by setting up the item colors
-  sta COLUP0                  ; 3 [34] Left item color
-  lda rightItem1Color         ; 3 [37] Right item color
-  sta COLUP1                  ; 3 [40]
-  lda topWallBuffer+2         ; 3 [43] Third playfield graphics
-  sta PF2                     ; 3 [46]
-  lda topWallBuffer+3         ; 3 [49] Fourth playfield graphic
-  sta PF1                     ; 3 [52]
-  dey                         ; 3 [55]
-  cpy #192-16                 ; 2 [57]
-  bne .topWalls               ; 2 [59]
+  tya                         ; 2  [72]
+  sta WSYNC                   ; 3  [75]
+  PositionPlayerVertically    ; 16 [16]
+  lda topWallBuffer           ; 3  [19] First playfield graphic
+  sta PF1                     ; 3  [22]
+  lda topWallBuffer+1         ; 3  [25] Second playfield graphic
+  sta PF2                     ; 3  [28]
+  lda leftItem1Color          ; 3  [31] Delay by setting up the item colors
+  sta COLUP0                  ; 3  [34] Left item color
+  lda rightItem1Color         ; 3  [37] Right item color
+  sta COLUP1                  ; 3  [40]
+  lda topWallBuffer+2         ; 3  [43] Third playfield graphics
+  sta PF2                     ; 3  [46]
+  lda topWallBuffer+3         ; 3  [49] Fourth playfield graphic
+  sta PF1                     ; 3  [52]
+  dey                         ; 3  [55]
+  cpy #192-16                 ; 2  [59]
+  bne .topWalls               ; 2/3[61]
   SLEEP 6                     ; 6 [65] Delay to get liquid timing right
   lda topLiquid               ; 3 [68] Get the liquid for the top half
   sta COLUBK                  ; 3 [71]
@@ -269,48 +269,47 @@ Kernel  SUBROUTINE
 
   ; 8 Scanlines for the bottom walls
 .bottomWalls
-  sta WSYNC                   ; (3)
-  tya                         ; 2 [ 2]
-  PositionPlayerVertically    ; 14[16]
-  lda bottomWallBuffer        ; (3)
-  sta PF1                     ; (3) 22
-  lda bottomWallBuffer+1      ; (3)
-  sta PF2                     ; (3) 28
-  SLEEP 12                    ; (12)
-  lda bottomWallBuffer+2      ; (3)
-  sta PF2                     ; (3) 26
-  lda bottomWallBuffer+3      ; (3)
-  sta PF1                     ; (3)
-  dey                         ; (3)
-  cpy #192-184                ; (2)
-  bne .bottomWalls            ; (2)
+  tya                         ; 2  [ 2]
+  sta WSYNC                   ; 3  [ 5]
+  PositionPlayerVertically    ; 16 [16]
+  lda bottomWallBuffer        ; 3  [19] First playfield graphic
+  sta PF1                     ; 3  [22]
+  lda bottomWallBuffer+1      ; 3  [25] Second playfield graphic
+  sta PF2                     ; 3  [28]
+  SLEEP 12                    ; 12 [40] Delay for a bit
+  lda bottomWallBuffer+2      ; 3  [43] Third playfield graphic
+  sta PF2                     ; 3  [46]
+  lda bottomWallBuffer+3      ; 3  [49] Fourth playfield graphic
+  sta PF1                     ; 3  [52]
+  dey                         ; 2  [54]
+  cpy #192-184                ; 2  [56]
+  bne .bottomWalls            ; 2/3[58]
 
   ; 8 scanlines for the bottom doors and walls
-  ; The timing of these 8 lines are VERY IMPORTANT to have a stable image
-  ldx bottomWallBuffer+3      ; (3) Fourth playfield graphic (Use X to get timing right)
+  ;  The timing of these 8 lines are VERY IMPORTANT to have a stable image
+  ldx bottomWallBuffer+3      ; 3  [61] Fourth playfield graphic (Use X to get timing right)
+  tya                         ; 2  [63]
 .bottomDoors
-  sta WSYNC                   ; (3)
-  tya                         ; 2 [ 2]
-  PositionPlayerVertically    ; 14[16]
-  lda bottomWallBuffer        ; (3) First playfield graphic
-  sta PF1                     ; (3)
-  lda bottomDoorColors        ; (3) Door 1 color
-  sta COLUBK                  ; (3)
-  lda.w bottomWallBuffer+1    ; (3) Second playfield graphic
-  sta PF2                     ; (3)
-  lda bottomDoorColors+1      ; (3) Door 2 color
-  sta COLUBK                  ; (3)
-  lda bottomWallBuffer+2      ; (3) Third playfield graphic
-  sta PF2                     ; (3)
-  lda bottomDoorColors+2      ; (4) Door 3 color
-  sta COLUBK                  ; (3)
-  stx PF1                     ; (3)
-  lda backgroundColor         ; (3)
-  dey                         ; (3)
-  ldx bottomWallBuffer+3      ; (3) Fourth playfield graphic (Use X to get timing right)
-  sta COLUBK                  ; (3)
-  cpy #0                      ; (2)
-  bne .bottomDoors            ; (2)
+  tya                         ; 2  [65]
+  sta WSYNC                   ; 3  [68]
+  PositionPlayerVertically    ; 16 [16]
+  lda bottomWallBuffer        ; 3  [19] First playfield graphic
+  sta PF1                     ; 3  [22] Decrement Y to get timing right
+  dey                         ; 2  [24]
+  lda bottomDoorColors        ; 3  [27] Door 1 color
+  sta COLUBK                  ; 3  [30]
+  lda bottomWallBuffer+1      ; 3  [33] Second playfield graphic
+  sta PF2                     ; 3  [36]
+  lda bottomDoorColors+1      ; 3  [39] Door 2 color
+  sta COLUBK                  ; 3  [42]
+  lda bottomWallBuffer+2      ; 3  [45] Third playfield graphic
+  sta PF2                     ; 3  [48]
+  lda bottomDoorColors+2      ; 3  [51] Door 3 color
+  sta COLUBK                  ; 3  [54]
+  stx PF1                     ; 3  [57]
+  ldx bottomWallBuffer+3      ; 3  [60] Fourth playfield graphic (Use X to get timing right)
+  cpy #192-192                ; 2  [62]
+  bne .bottomDoors            ; 2/3[64]
 
   ; End of screen - enter blanking
   sta WSYNC

@@ -1,26 +1,27 @@
 ; Useful method to vertically position the ball player
 ;
 ; Input:
-;  PlayerY = Expected player scanline
 ;  Acc = The current scanline (0 to 191)
+;  playerY = Expected player scanline
+;  playerHeight = Height of the player in scanlines
 ;
 ; Output: None
 ; Modified: Acc
-; Cycles: 14
+; Cycles: 16
 ;
 ; Note: Assumes that the carry is already set for proper subtraction
 ;
   MAC PositionPlayerVertically
-    SBC playerY       ; (3) Assumes that carry is already set
-    CMP #8            ; (2) Player is 8 pixels high
-    BCC .draw         ; (2)
-    LDA #0            ; (2)
-    BCS .end          ; (2)
+    sbc playerY       ; 3  [ 3] Assumes that carry is already set
+    cmp playerHeight  ; 3  [ 6] Compare to height of player
+    bcc .draw         ; 2/3[ 8]
+    lda #0            ; 2  [10] Disable ball
+    bcs .end          ; 3  [13] Should always branch
 .draw
-    LDA #BALL_ENABLE  ; (2)
-    SEC               ; (2)
+    lda #BALL_ENABLE  ; 2  [11] Enable the ball
+    sec               ; 2  [13]
 .end
-    STA ENABL         ; (3)
+    sta ENABL         ; 3  [16] Store the ball status
   ENDM
 
 
@@ -128,8 +129,8 @@
   asl
   bmi .secondWall2Closed
 .secondWall2Open
-  ldx #%11110000  ; PF1 is normal direction
-  ldy #%11111100  ; PF2 is reversed
+  ldx #%11111100  ; PF2 is reversed
+  ldy #%11110000  ; PF1 is normal direction
   jmp .finishSecondWall
 .secondWall2Closed
   ldx #%11111111  ; Solid wall

@@ -18,6 +18,8 @@ Reset
   sta playerX
   lda #0
   sta playerY
+  lda #8
+  sta playerHeight
 
   lda #$1E
   sta wallColor
