@@ -81,16 +81,16 @@ Kernel  SUBROUTINE
   sta PF0
   lda #$0
   SEC
-  sta WSYNC
-  sta VBLANK         ; Accumulator D1=0, turns off Vertical Blank signal (image output on)
+  sta WSYNC                   ; 3
+  sta VBLANK                  ; 3 [ 3] Accumulator D1=0, turns off Vertical Blank signal (image output on)
 
   ; --- Start of screen ---
 
   ; 8 scanlines for the top doors and walls
-  ; The timing of these 8 lines are VERY IMPORTANT to have a stable image
-  ldx topWallBuffer+3         ; (3) Fourth playfield graphic (Use X to get timing right)
+  ;  The timing of these 8 lines are VERY IMPORTANT to have a stable image
+  ldx topWallBuffer+3         ; 3 [ 6] Fourth playfield graphic (Use X to get timing right)
 .topDoors
-  sta WSYNC                   ; 3
+  sta WSYNC                   ; 3 [ 9]
   PositionPlayerVertically    ; 16[16]
   lda topWallBuffer           ; 3 [19] First playfield graphic
   sta PF1                     ; 3 [22]
@@ -139,80 +139,69 @@ Kernel  SUBROUTINE
 .wall1
   sta WSYNC                   ; 3 [74]
   PositionPlayerVertically    ; 16[16]
-  lda #$00                    ; 3 [19] Always clear middle area between walls
-  sta PF1                     ; 3 [22]
-  lda wall1Buffer             ; 3 [25] Left of middle walls
-  sta PF2                     ; 3 [28]
-  lda wall1Buffer+1           ; 3 [31] Right of middle walls
-  dey                         ; 2 [33]
-  sty tempYBuffer             ; 3 [36] Loading sprite requires Y to be stored in temp location
+  lda #$00                    ; 2 [18] Always clear middle area between walls
+  sta PF1                     ; 3 [21]
+  lda wall1Buffer             ; 3 [24] Left of middle walls
+  sta PF2                     ; 3 [27]
+  lda wall1Buffer+1           ; 3 [30] Right of middle walls
+  ldx #1                      ; 2 [32] Load X to waste a cycle. X is used for default item offset of 1
+  SLEEP 2                     ; 2 [34]
+  dey                         ; 2 [36]
   cpy #192-24                 ; 2 [38]
   sta PF2                     ; 3 [41]
   bne .wall1                  ; 2 [43]
 
   ; Prepare the first item for the next round
-  tya                         ; 2 [45] Compute graphics index
-  adc #$38                    ; 2 [47] Add an offset to zero the index
-  lsr                         ; 2 [49] Shift right to have 4 scanline pixels
-  lsr                         ; 2 [51]
-  and #$07                    ; 2 [53] Mask extra bits
-  tay                         ; 2 [55]
-  lda (leftItem1Sprite),y     ; 6 [61] Load and store the sprite
-  sta GRP0                    ; 3 [64]
-  ldy tempYBuffer             ; 3 [67] Get back Y from temporary location
-  sec                         ; 2 [69] Carry must be set to position player
+  stx itemSpriteOffset        ; 3 [46] Set the item offset to 1
+  ldy #0                      ; 2 [48] Compute graphics index
+  lda (leftItem1Sprite),y     ; 6 [54] Load and store the left sprite
+  sta GRP0                    ; 3 [57]
+  lda (rightItem1Sprite),y    ; 6 [63] Load and store the right sprite
+  sta GRP1                    ; 3 [66]
+  ldy #192-24                 ; 2 [68] We know what the Y will be
+  sec                         ; 2 [70] Carry must be set to position player
 
   ; 8 scanlines of a horizontal wall with an item
-  ;  Updates the item on every other scanline
+  ;  Updates the item index every 4 scanlines
 .wall1Item
-  sta WSYNC                   ; 3 [72]
-  ; Update right item
+  sta WSYNC                   ; 3 [73]
   PositionPlayerVertically    ; 16[16]
   lda wall1Buffer             ; 3 [19] Left of middle walls
   sta PF2                     ; 3 [22]
-  sty tempYBuffer             ; 3 [25] Loading sprite requires Y to be stored in temp location
-  tya                         ; 2 [27] Compute graphics index
-  adc #$38                    ; 2 [29] Add an offset to zero the index
-  lsr                         ; 2 [31] Shift right to have 4 scanline pixels
-  lsr                         ; 2 [33]
-  and #$0f                    ; 2 [35] Mask extra bits
-  tay                         ; 2 [37]
-  lda (leftItem1Sprite),y     ; 6 [43] Load and store the sprite
+  sty tempYBuffer             ; 3 [25] Load sprites every scanline to waste some cycles
+  ldy itemSpriteOffset        ; 3 [28]
+  lda (leftItem1Sprite),y     ; 6 [34] Load and store the left sprite
+  sta GRP0                    ; 3 [37]
+  lda (rightItem1Sprite),y    ; 6 [43] Load and store the right sprite
   ldy wall1Buffer+1           ; 3 [46] Right of middle walls
   sty PF2                     ; 3 [49]
-  sta GRP0                    ; 3 [52]
-  ldy tempYBuffer             ; 3 [55] Get back Y from temporary location
+  sta GRP1                    ; 3 [52]
+  ldy tempYBuffer             ; 3 [55]
   dey                         ; 2 [57]
-  sta WSYNC                   ; 3 [60]
-  ; Update left item
-  PositionPlayerVertically    ; 16[16]
-  lda wall1Buffer             ; 3 [19] Left of middle walls
-  sta PF2                     ; 3 [22]
-  sty tempYBuffer             ; 3 [25] Loading sprite requires Y to be stored in temp location
-  tya                         ; 2 [27] Compute graphics index
-  adc #$3C                    ; 2 [29] Add an offset to zero the index
-  lsr                         ; 2 [31] Shift right to have 4 scanline pixels
-  lsr                         ; 2 [33]
-  and #$0f                    ; 2 [35] Mask extra bits
-  tay                         ; 2 [37]
-  lda (leftItem1Sprite),y     ; 6 [43] Load and store the sprite
-  ldy wall1Buffer+1           ; 3 [46] Right of middle walls
-  sty PF2                     ; 3 [49]
-  sta GRP0                    ; 3 [52]
-  ldy tempYBuffer             ; 3 [55] Get back Y from temporary location
-  dey                         ; 2 [57]
-  cpy #192-32                 ; 2 [59]
-  bne .wall1Item              ; 2 [61]
+  cpy #192-28                 ; 2 [59]
+  bne .wall1Item_NoInc        ; 2 [61]
+  inc itemSpriteOffset        ; 5 [66]
+.wall1Item_NoInc
+  cpy #192-32                 ; 2 [63|68]
+  bne .wall1Item              ; 2 [65|70]
+  inc itemSpriteOffset        ; 5 [70] Add 1 to the offset
 
-  ; 24 scanlines of door
-.door1
-  sta WSYNC                   ; 3 [64]
-  PositionPlayerVertically
-  lda #0
-  sta PF0
+  ; 32 scanlines for the first door
+  ;  Door is rendered in 3 chunks, 8-16-8
+  ;  Updates the item on every other scanline
+
+  ; 8 scanlines for first chunk of door
+  lda door1Buffer             ; 3 [63] Load registers to quickly update frame data
+  ldx leftDoorColors          ; 3 [66]
+.door1Chunk1
+  sta WSYNC                   ; 3 [72]
+  sta PF0                     ; 3 [ 3] Left door visible or not
+  stx COLUP0                  ; 3 [ 6] Left door color
+  ; Update right item
+  PositionPlayerVertically    ; 16[22]
   dey
   cpy #192-56
-  bne .door1
+  bne .door1Chunk1
 
   ;24 scanlines of wall
 .wall2

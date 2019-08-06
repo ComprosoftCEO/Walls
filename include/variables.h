@@ -44,7 +44,17 @@ rightItem3Color     ds 1    ; Color of the bottom right item
 ; Wall Buffers (calculated by the Kernel)
 topWallBuffer       ds 4    ; Temporary buffer for the top wall PF graphics
 wall1Buffer         ds 2    ; First layer of walls buffer
+door1Buffer         ds 6    ; Buffer for the first set of doors (LR,LR,LR)
+wall2Buffer         ds 4    ; Second layer of walls buffer
+wall3Buffer         ds 2    ; Third layer of walls buffer
+door2Buffer         ds 2    ; Buffer for the second set of doors (LR)
+wall4Buffer         ds 4    ; Fourth layer of walls buffer
+wall5Buffer         ds 2    ; Fifth layer of walls buffer
+door3Buffer         ds 6    ; Buffer for the third set of doors (LR,LR,LR)
+wall6Buffer         ds 4    ; Sixth layer of walls buffer
+wall7Buffer         ds 2    ; Seventh layer of wall buffer
 bottomWallBuffer    ds 4    ; Temporary buffer for the bottom wall PF graphics
 
 ; Other temporary variables
-tempYBuffer = topWallBuffer ; Only use this after finished with topWallBuffer
+tempYBuffer      = topWallBuffer    ; Store the Y when calculating item offset
+itemSpriteOffset = topWallBuffer+1  ; Index location for item sprite
