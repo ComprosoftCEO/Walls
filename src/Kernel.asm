@@ -54,8 +54,9 @@ Kernel  SUBROUTINE
   sta REFP1                       ; (3)
   sta VDELP1                      ; (3) No delay for player 1 and ball
   sta VDELBL                      ; (3)
-  lda #PLAYER_VERT_DELAY          ; (3) Vertical delay player 0
+  lda #PLAYER_VERT_DELAY          ; (3) Vertical delay both players
   sta VDELP0                      ; (3)
+  sta VDELP1                      ; (3)
   lda backgroundColor             ; (3) Configure foreground & background
   sta COLUBK                      ; (3)
   lda wallColor                   ; (3)
@@ -91,7 +92,8 @@ Kernel  SUBROUTINE
   ldx topWallBuffer+3         ; 3 [ 6] Fourth playfield graphic (Use X to get timing right)
 .topDoors
   sta WSYNC                   ; 3 [ 9]
-  PositionPlayerVertically    ; 16[16]
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   lda topWallBuffer           ; 3 [19] First playfield graphic
   sta PF1                     ; 3 [22]
   lda topDoorColors           ; 3 [25] Door 1 color
@@ -115,7 +117,8 @@ Kernel  SUBROUTINE
   ; 8 scanlines for the top walls (where doors aren't shown)
 .topWalls
   sta WSYNC                   ; 3 [75]
-  PositionPlayerVertically    ; 16[16]
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   lda topWallBuffer           ; 3 [19] First playfield graphic
   sta PF1                     ; 3 [22]
   lda topWallBuffer+1         ; 3 [25] Second playfield graphic
@@ -138,7 +141,8 @@ Kernel  SUBROUTINE
   ; 8 scanlines of horizontal walls with no item
 .wall1
   sta WSYNC                   ; 3 [74]
-  PositionPlayerVertically    ; 16[16]
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   lda #$00                    ; 2 [18] Always clear middle area between walls
   sta PF1                     ; 3 [21]
   lda wall1Buffer             ; 3 [24] Left of middle walls
@@ -165,7 +169,8 @@ Kernel  SUBROUTINE
   ;  Updates the item index every 4 scanlines
 .wall1Item
   sta WSYNC                   ; 3 [73]
-  PositionPlayerVertically    ; 16[16]
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   lda wall1Buffer             ; 3 [19] Left of middle walls
   sta PF2                     ; 3 [22]
   sty tempYBuffer             ; 3 [25] Load sprites every scanline to waste some cycles
@@ -198,7 +203,8 @@ Kernel  SUBROUTINE
   sta PF0                     ; 3 [ 3] Left door visible or not
   stx COLUP0                  ; 3 [ 6] Left door color
   ; Update right item
-  PositionPlayerVertically    ; 16[22]
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   dey
   cpy #192-56
   bne .door1Chunk1
@@ -206,7 +212,8 @@ Kernel  SUBROUTINE
   ;24 scanlines of wall
 .wall2
   sta WSYNC
-  PositionPlayerVertically
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   lda #$FF
   sta PF0
   dey
@@ -216,7 +223,8 @@ Kernel  SUBROUTINE
   ; 32 scanlines of door
 .door2
   sta WSYNC
-  PositionPlayerVertically
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   lda #0
   sta PF0
   dey
@@ -226,7 +234,8 @@ Kernel  SUBROUTINE
   ; 24 scanlines of wall
 .wall3
   sta WSYNC
-  PositionPlayerVertically
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   lda #$FF
   sta PF0
   dey
@@ -236,7 +245,8 @@ Kernel  SUBROUTINE
   ; 24 scanlines of door
 .door3
   sta WSYNC
-  PositionPlayerVertically
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   lda #0
   sta PF0
   dey
@@ -246,7 +256,8 @@ Kernel  SUBROUTINE
   ; 16 scanlines of wall
 .wall4
   sta WSYNC
-  PositionPlayerVertically
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
 
   ; Just for now to avoid page overflow with branch
   SLEEP 40
@@ -259,7 +270,8 @@ Kernel  SUBROUTINE
   ; 8 Scanlines for the bottom walls
 .bottomWalls
   sta WSYNC                   ; (3)
-  PositionPlayerVertically    ; (16)
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   lda bottomWallBuffer        ; (3)
   sta PF1                     ; (3) 22
   lda bottomWallBuffer+1      ; (3)
@@ -278,7 +290,8 @@ Kernel  SUBROUTINE
   ldx bottomWallBuffer+3      ; (3) Fourth playfield graphic (Use X to get timing right)
 .bottomDoors
   sta WSYNC                   ; (3)
-  PositionPlayerVertically    ; (16)
+  tya                         ; 2 [ 2]
+  PositionPlayerVertically    ; 14[16]
   lda bottomWallBuffer        ; (3) First playfield graphic
   sta PF1                     ; (3)
   lda bottomDoorColors        ; (3) Door 1 color

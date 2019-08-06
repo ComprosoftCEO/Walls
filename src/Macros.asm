@@ -2,16 +2,15 @@
 ;
 ; Input:
 ;  PlayerY = Expected player scanline
-;  Y = The current scanline (0 to 191)
+;  Acc = The current scanline (0 to 191)
 ;
 ; Output: None
 ; Modified: Acc
-; Cycles: 16
+; Cycles: 14
 ;
 ; Note: Assumes that the carry is already set for proper subtraction
 ;
   MAC PositionPlayerVertically
-    TYA               ; (2)
     SBC playerY       ; (3) Assumes that carry is already set
     CMP #8            ; (2) Player is 8 pixels high
     BCC .draw         ; (2)
